@@ -51,7 +51,7 @@ def make_board(rows, columns):
     return game_board
 
 
-def make_character():
+def make_character(name):
     """
     Initialize a character with the attributes of X-coordinate, Y-coordinate, and Current HP as keys in a dictionary.
 
@@ -68,7 +68,7 @@ def make_character():
     >>> player["Current HP"]
     5
     """
-    return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 5}
+    return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 5, "Max HP": 5, "Luck": 1, "Level": 1, "EXP": 0, "Name": name}
 
 
 def game():
@@ -78,7 +78,8 @@ def game():
     rows = 10
     columns = 10
     board = make_board(rows, columns)
-    character = make_character()
+    character_name = input("Enter character name: ")
+    character = make_character(character_name)
     achieved_goal = False
 
     describe_current_location(board, character)
@@ -93,8 +94,13 @@ def game():
             there_is_a_challenger = check_for_foes()
 
             if there_is_a_challenger:
-                guessing_game(character)
+                won_challenge = guessing_game(character)
 
+                if won_challenge:
+                    gain_experience(character)
+
+                    if has_leveled_up(character):
+                        level_up(character)
             achieved_goal = check_if_goal_attained(rows, columns, character)
 
         else:
@@ -344,6 +350,44 @@ def is_alive(character):
     False
     """
     return character["Current HP"] > 0
+
+
+def gain_experience(character):
+    """
+    Add experience to player character.
+
+    :param character:
+    :return:
+    """
+    character["EXP"] += 1
+
+
+def has_leveled_up(character):
+    """
+    Determine whether the character has enough EXP to level up.
+
+    :param character: a dictionary representing the character
+    :return: True if the character should level up, else False
+    """
+    thresholds = {1: 3, 2: 6}
+    current_level = character["Level"]
+
+    return current_level in thresholds and character["EXP"] >= thresholds[current_level]
+
+def level_up(character):
+    """
+    Increase the character's level and increase character level, max hp, current hp, and luck.
+
+    :param character: a dictionary representing the character
+    :postcondition: increase level, max HP, current HP, and luck
+    """
+    character["Level"] += 1
+    character["Max HP"] += 2
+    character["Current HP"] = character["Max HP"]
+    character["Luck"] += 1
+
+    print(f"{character['Name']} leveled up to level {character['Level']}!")
+    print(f"Max HP is now {character['Max HP']} and Luck is now {character['Luck']}.")
 
 
 def main():
