@@ -26,10 +26,16 @@ def make_board(rows, columns):
     >>> board = make_board(2, 2)
     >>> len(board)
     4
-    >>> board[(0, 0)]
-    'Empty room'
     """
-    game_board = {}
+    descriptions = [
+        "A foggy forest clearing",
+        "A narrow path covered in roots",
+        "A glowing mushroom grove",
+        "A silent pond reflecting moonlight",
+        "A ruined shrine overtaken by vines",
+        "A dark thicket where branches claw at you",
+        "A clearing filled with strange whispers",
+    ]
 
     if type(rows) is not int:
         raise ValueError("rows must be an integer")
@@ -44,9 +50,7 @@ def make_board(rows, columns):
         raise ValueError("columns must be greater than 0")
 
     else:
-        for row in range(rows):
-            for column in range(columns):
-                game_board[(row, column)] = "Empty room"
+        game_board = {(row, column): random.choice(descriptions) for row in range(rows) for column in range(columns)}
 
     return game_board
 
@@ -68,7 +72,8 @@ def make_character(name):
     >>> player["Current HP"]
     5
     """
-    return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 5, "Max HP": 5, "Luck": 1, "Level": 1, "EXP": 0, "Name": name}
+    return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 5,
+            "Max HP": 5, "Luck": 1, "Level": 1, "EXP": 0, "Name": name}
 
 
 def game():
@@ -79,6 +84,7 @@ def game():
     columns = 10
     board = make_board(rows, columns)
     character_name = input("Enter character name: ")
+    describe_game()
     character = make_character(character_name)
     achieved_goal = False
 
@@ -91,24 +97,33 @@ def game():
         if valid_move:
             move_character(character, direction)
             describe_current_location(board, character)
-            there_is_a_challenger = check_for_foes()
 
-            if there_is_a_challenger:
-                won_challenge = guessing_game(character)
+            if check_if_goal_attained(rows, columns, character):
+                if character["Level"] < 3:
+                    print("You found the Forest Guardian, but you must be level 3 to challenge it.")
+                else:
+                    final_boss_encounter(character)
+            else:
+                there_is_a_challenge = check_for_foes()
 
-                if won_challenge:
-                    gain_experience(character)
+                if there_is_a_challenge:
+                    challenge_type = choose_challenge()
 
-                    if has_leveled_up(character):
-                        level_up(character)
-            achieved_goal = check_if_goal_attained(rows, columns, character)
+                    if challenge_type == "enemy":
+                        won = guessing_game(character)
+                    else:
+                        won = potion_gamble(character)
 
+                    if won:
+                        gain_experience(character)
+                        if has_leveled_up(character):
+                            level_up(character)
         else:
             print(f"You are at position ({character['X-coordinate']}, {character['Y-coordinate']}) "
                   f"You cannot go that way. Try again.")
 
     if achieved_goal:
-        print("Congratulations! You made it to the goal.")
+        print("Congratulations! You defeated the Forest Guardian and escaped!")
     else:
         print("Game over! You ran out of HP.")
 
@@ -190,7 +205,7 @@ def validate_move(board, character, direction):
     :return: True if coordinates after moving is within the board, else False
 
     >>> game_board = make_board(5, 5)
-    >>> game_character = make_character()
+    >>> game_character = make_character("Luka")
     >>> validate_move(game_board, game_character, "North")
     False
     >>> validate_move(game_board, game_character, "East")
@@ -317,20 +332,19 @@ def guessing_game(character):
 
         if guess == secret_number:
             print(f"You're right!, you have {character['Current HP']} HP\n")
+            return True
 
         elif guess < secret_number:
             character["Current HP"] -= 1
             print(f"Too low, the number was {secret_number}, "
                   f"you lose 1 HP, you now have {character['Current HP']} HP\n")
+            return False
 
         else:
             character["Current HP"] -= 1
             print(f"Too high, the number was {secret_number}, "
                   f"you lose 1 HP, you now have {character['Current HP']} HP\n")
-
-        break
-
-    return character
+            return False
 
 
 def is_alive(character):
@@ -374,6 +388,7 @@ def has_leveled_up(character):
 
     return current_level in thresholds and character["EXP"] >= thresholds[current_level]
 
+
 def level_up(character):
     """
     Increase the character's level and increase character level, max hp, current hp, and luck.
@@ -388,6 +403,53 @@ def level_up(character):
 
     print(f"{character['Name']} leveled up to level {character['Level']}!")
     print(f"Max HP is now {character['Max HP']} and Luck is now {character['Luck']}.")
+
+
+def potion_gamble(character):
+    """
+    Run a potion gamble challenge.
+
+    :param character: a dictionary representing the character
+    :return: True after resolving the event
+    """
+    print("You find a mysterious potion.")
+    outcome = random.randint(1, 3)
+
+    if outcome == 1:
+        if character["Current HP"] < character["Max HP"]:
+            character["Current HP"] += 1
+        print(f"The potion helps you. HP is now {character['Current HP']}.")
+    else:
+        character["Current HP"] -= 1
+        print(f"The potion was poisonous. HP is now {character['Current HP']}.")
+
+    return True
+
+
+def choose_challenge():
+    """
+    Randomly choose a challenge type.
+
+    :return: a string representing the chosen challenge
+    """
+    return random.choice(["enemy", "potion"])
+
+
+def final_boss_encounter(character):
+    """
+
+    :param character:
+    :return:
+    """
+    pass
+
+
+def describe_game():
+    """
+
+    :return:
+    """
+    print("Game info")
 
 
 def main():
