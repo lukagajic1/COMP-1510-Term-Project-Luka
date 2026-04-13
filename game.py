@@ -432,7 +432,9 @@ def potion_gamble(character):
     :return: True if potion helps, False if poisonous
     """
     print("You find a mysterious potion.")
-    outcome = random.randint(1, 3)
+    lower = 1
+    upper = 4 - character["Level"]
+    outcome = random.randint(lower, upper)
 
     if outcome == 1:
         if character["Current HP"] < character["Max HP"]:
