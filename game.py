@@ -26,6 +26,8 @@ def make_board(rows, columns):
     >>> board = make_board(2, 2)
     >>> len(board)
     4
+    >>> (0, 0) in board
+    True
     """
     descriptions = [
         "A foggy forest clearing",
@@ -66,14 +68,14 @@ def make_character(name):
              where 'X-coordinate' stores the integer row position, 'Y-coordinate' stores the integer column position,
              and 'Current HP' stores the integer health value of the character
 
-    >>> player = make_character()
+    >>> player = make_character("Luka")
     >>> player["X-coordinate"]
     0
     >>> player["Current HP"]
     5
     """
-    return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 5,
-            "Max HP": 5, "Luck": 1, "Level": 1, "EXP": 0, "Name": name}
+    return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 8,
+            "Max HP": 8, "Luck": 1, "Level": 1, "EXP": 0, "Name": name}
 
 
 def game():
@@ -103,7 +105,7 @@ def game():
                 if character["Level"] < 3:
                     print("You found the Forest Guardian, but you must be level 3 to challenge it.")
                 else:
-                    final_boss_encounter(character)
+                    achieved_goal = final_boss_encounter(character)
             else:
                 there_is_a_challenge = check_for_foes()
 
@@ -240,7 +242,7 @@ def move_character(character, direction):
     :postcondition: update the value within the character coordinates key based on chosen direction
     :raises ValueError: if direction is not string 'North', 'South', 'East', or 'West'
 
-    >>> player = make_character()
+    >>> player = make_character("Luka")
     >>> move_character(player, "East")
     >>> player["Y-coordinate"]
     1
@@ -276,7 +278,7 @@ def check_if_goal_attained(rows, columns, character):
                     of the board.
     :return: True if the character coordinates match the bottom right coordinates of the board, else False
 
-    >>> player = make_character()
+    >>> player = make_character("Luka")
     >>> check_if_goal_attained(5, 5, player)
     False
     >>> player["X-coordinate"] = 4
@@ -312,7 +314,7 @@ def guessing_game(character):
     :return: character dictionary with updated 'Current HP' key's value
     """
     lower = 1
-    upper = 5
+    upper = max(2, 6 - character["Level"])
     secret_number = random.randint(lower, upper)
 
     print("A foe appears!")
@@ -357,7 +359,7 @@ def is_alive(character):
     :postcondition: determine if the character 'Current HP' key is greater than 0
     :return: True if the 'Current HP' key in character dictionary value is > 0 , else False
 
-    >>> player = make_character()
+    >>> player = make_character("Luka")
     >>> is_alive(player)
     True
     >>> player["Current HP"] = 0
@@ -369,12 +371,30 @@ def is_alive(character):
 
 def gain_experience(character):
     """
-    Add experience to player character.
+    Add experience to the player character and display progress.
 
-    :param character:
-    :return:
+    :param character: a dictionary representing the character
+    :postcondition: increase EXP and display current progress toward next level
     """
     character["EXP"] += 1
+
+    threshold = get_exp_threshold(character)
+
+    if threshold:
+        print(f"You gained 1 EXP! ({character['EXP']}/{threshold} EXP)")
+    else:
+        print(f"You gained 1 EXP! (MAX LEVEL)")
+
+
+def get_exp_threshold(character):
+    """
+    Get the EXP required for the next level.
+
+    :param character: a dictionary representing the character
+    :return: EXP threshold for next level or None if max level reached
+    """
+    thresholds = {1: 3, 2: 6}
+    return thresholds.get(character["Level"])
 
 
 def has_leveled_up(character):
@@ -438,11 +458,31 @@ def choose_challenge():
 
 def final_boss_encounter(character):
     """
-
-    :param character:
-    :return:
+    Resolve the final boss riddle challenge.
     """
-    pass
+    print("\nThe Forest Guardian rises before you.")
+    print('"Answer my riddle, and you may leave this forest."\n')
+
+    while True:
+        print("What walks on four legs in the morning,")
+        print("two legs in the afternoon,")
+        print("and one leg at night?")
+
+        answer = input("\nEnter your answer: ").strip().lower()
+
+        if answer in ["human", "a human", "man", "a man", "person", "a person"]:
+            print("\nThe Forest Guardian bows before you.")
+            print("You solved the riddle and escaped the forest!")
+            return True
+
+        character["Current HP"] -= 2
+        print("\nWrong. The Forest Guardian strikes you down.")
+        print(f"You lose 2 HP and now have {character['Current HP']} HP.")
+
+        if not is_alive(character):
+            return False
+
+        print("Try again...\n")
 
 
 def display_map(rows, columns, character):
