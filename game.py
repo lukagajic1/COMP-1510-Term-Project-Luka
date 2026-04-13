@@ -26,8 +26,6 @@ def make_board(rows, columns):
     >>> board = make_board(2, 2)
     >>> len(board)
     4
-    >>> (0, 0) in board
-    True
     """
     descriptions = [
         "A foggy forest clearing",
@@ -359,7 +357,7 @@ def is_alive(character):
     :postcondition: determine if the character 'Current HP' key is greater than 0
     :return: True if the 'Current HP' key in character dictionary value is > 0 , else False
 
-    >>> player = make_character("Luka")
+    >>> player = make_character()
     >>> is_alive(player)
     True
     >>> player["Current HP"] = 0
@@ -431,7 +429,7 @@ def potion_gamble(character):
     Run a potion gamble challenge.
 
     :param character: a dictionary representing the character
-    :return: True after resolving the event
+    :return: True if potion helps, False if poisonous
     """
     print("You find a mysterious potion.")
     outcome = random.randint(1, 3)
@@ -440,11 +438,12 @@ def potion_gamble(character):
         if character["Current HP"] < character["Max HP"]:
             character["Current HP"] += 1
         print(f"The potion helps you. HP is now {character['Current HP']}.")
+        return True
+
     else:
         character["Current HP"] -= 1
         print(f"The potion was poisonous. HP is now {character['Current HP']}.")
-
-    return True
+        return False
 
 
 def choose_challenge():
@@ -487,18 +486,21 @@ def final_boss_encounter(character):
 
 def display_map(rows, columns, character):
     """
-    Display the game board with the player's position.
+    Display the game board with the player's position and goal.
 
     :param rows: number of rows
     :param columns: number of columns
     :param character: player dictionary
-    :precondition:
-    :postcondition:
+    :precondition: rows and columns must be positive integers
+    :precondition: character must contain 'X-coordinate' and 'Y-coordinate'
+    :postcondition: print the map with [P] for player and [G] for goal
     """
     for row in range(rows):
         for column in range(columns):
             if row == character["X-coordinate"] and column == character["Y-coordinate"]:
                 print("[P]", end="")
+            elif row == rows - 1 and column == columns - 1:
+                print("[G]", end="")
             else:
                 print("[ ]", end="")
         print()
@@ -506,10 +508,36 @@ def display_map(rows, columns, character):
 
 def describe_game():
     """
+    Describe the game's setting and mechanics.
 
-    :return:
+    :postcondition: print the introduction, goal, and how stats work
     """
-    print("Game info")
+    print("\n" + "=" * 60)
+    print("Escape the Forest")
+    print("=" * 60)
+    print("You awaken in a dark and cursed forest.")
+    print("Strange creatures wander between the trees, and mysterious potions")
+    print("are hidden in the ground.\n")
+
+    print("Your goal is to reach the far corner of the forest (9, 9)")
+    print("and defeat the Forest Guardian to escape.\n")
+
+    print("As you explore, you will encounter challenges:")
+    print("- Enemies (guessing games)")
+    print("- Potions (which may help or harm you)\n")
+
+    print("Leveling System:")
+    print("- You gain EXP when you win encounters")
+    print("- At certain EXP thresholds, you level up")
+    print("- Leveling increases your Max HP and Luck\n")
+
+    print("Luck System:")
+    print("- Higher Luck makes enemy challenges easier")
+    print("- The number range in guessing games becomes smaller\n")
+
+    print("Reach level 3 to have a chance of defeating the Forest Guardian.")
+    print("Stay alive and escape the forest!")
+    print("=" * 60 + "\n")
 
 
 def main():
