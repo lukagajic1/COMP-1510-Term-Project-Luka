@@ -96,6 +96,7 @@ def game():
 
         if valid_move:
             move_character(character, direction)
+            display_map(rows, columns, character)
             describe_current_location(board, character)
 
             if check_if_goal_attained(rows, columns, character):
@@ -442,6 +443,25 @@ def final_boss_encounter(character):
     :return:
     """
     pass
+
+
+def display_map(rows, columns, character):
+    """
+    Display the game board with the player's position.
+
+    :param rows: number of rows
+    :param columns: number of columns
+    :param character: player dictionary
+    :precondition:
+    :postcondition:
+    """
+    for row in range(rows):
+        for column in range(columns):
+            if row == character["X-coordinate"] and column == character["Y-coordinate"]:
+                print("[P]", end="")
+            else:
+                print("[ ]", end="")
+        print()
 
 
 def describe_game():
