@@ -1,5 +1,5 @@
 """
-Luka Gajic # all docstrings / doctests original
+Luka Gajic
 A01495410
 
 Create a game.
@@ -9,7 +9,7 @@ import copy
 from itertools import product
 
 
-def make_board(rows, columns):
+def make_board(rows: int, columns: int) -> dict:
     """
     Create and return a dictionary with tuple coordinates as keys representing the game board and
     short room descriptions as values.
@@ -59,7 +59,7 @@ def make_board(rows, columns):
     return game_board
 
 
-def make_character(name):
+def make_character(name: str) -> dict:
     """
     Initialize a character with the attributes of X-coordinate, Y-coordinate, Max HP, Level, EXP, Name, Luck, and
     Current HP as keys in a dictionary.
@@ -136,7 +136,7 @@ def game():
         print("Game over! You ran out of HP.")
 
 
-def describe_current_location(board, character):
+def describe_current_location(board: dict, character: dict):
     """
     Describe the character's current location on the board.
 
@@ -156,7 +156,7 @@ def describe_current_location(board, character):
         print("Invalid location, not on board")
 
 
-def get_user_choice():
+def get_user_choice() -> str:
     """
     Determine the user's chosen direction.
 
@@ -185,7 +185,7 @@ def get_user_choice():
                 print("That is not a valid direction. Try again.")
 
 
-def validate_move(board, character, direction):
+def validate_move(board: dict, character: dict, direction: str) -> bool:
     """
     Determine whether the user requested movement is within the boundaries of
     the board.
@@ -225,7 +225,7 @@ def validate_move(board, character, direction):
     return (character_copy["X-coordinate"], character_copy["Y-coordinate"]) in board
 
 
-def move_character(character, direction):
+def move_character(character: dict, direction: str):
     """
     Update the character X or Y coordinates value in the character dictionary based on the chosen direction.
 
@@ -257,7 +257,7 @@ def move_character(character, direction):
         raise ValueError("Direction must be North, South, West, or East")
 
 
-def check_if_goal_attained(rows, columns, character):
+def check_if_goal_attained(rows: int, columns: int, character: dict) -> bool:
     """
     Determine whether the character coordinates match the bottom-right corner coordinates of
     the board.
@@ -284,7 +284,7 @@ def check_if_goal_attained(rows, columns, character):
     return (character["X-coordinate"], character["Y-coordinate"]) == (rows - 1, columns - 1)
 
 
-def check_for_foes():
+def check_for_foes() -> bool:
     """
     Roll a random integer between 1 - 4 and check if that integer equals 1.
 
@@ -294,7 +294,7 @@ def check_for_foes():
     return random.randint(1, 4) == 1
 
 
-def guessing_game(character):
+def guessing_game(character: dict) -> bool:
     """
     Play a guessing game.
 
@@ -344,8 +344,10 @@ def guessing_game(character):
                   f"you lose 1 HP, you now have {character['Current HP']} HP\n")
             return False
 
+    return False
 
-def is_alive(character):
+
+def is_alive(character: dict) -> bool:
     """
     Determine whether the value for 'Current HP' key in character dictionary is above 0.
 
@@ -364,7 +366,7 @@ def is_alive(character):
     return character["Current HP"] > 0
 
 
-def gain_experience(character):
+def gain_experience(character: dict):
     """
     Add experience to the player character and display progress.
 
@@ -382,7 +384,7 @@ def gain_experience(character):
         print(f"You gained 1 EXP! (MAX LEVEL)")
 
 
-def get_exp_threshold(character):
+def get_exp_threshold(character: dict) -> int | None:
     """
     Get the EXP required for the next level.
 
@@ -402,7 +404,7 @@ def get_exp_threshold(character):
     return thresholds.get(character["Level"])
 
 
-def has_leveled_up(character):
+def has_leveled_up(character: dict) -> bool:
     """
     Determine whether the character has enough EXP to level up.
 
@@ -425,7 +427,7 @@ def has_leveled_up(character):
     return current_level in thresholds and character["EXP"] >= thresholds[current_level]
 
 
-def level_up(character):
+def level_up(character: dict):
     """
     Increase the character's level and increase character level, max hp, current hp, and luck.
 
@@ -449,7 +451,7 @@ def level_up(character):
     print(f"Max HP is now {character['Max HP']} and Luck is now {character['Luck']}.")
 
 
-def potion_gamble(character):
+def potion_gamble(character: dict) -> bool:
     """
     Run a potion gamble challenge.
 
@@ -477,7 +479,7 @@ def potion_gamble(character):
         return False
 
 
-def choose_challenge():
+def choose_challenge() -> str:
     """
     Randomly choose a challenge type.
 
@@ -487,7 +489,7 @@ def choose_challenge():
     return random.choice(["enemy", "potion"])
 
 
-def final_boss_encounter(character):
+def final_boss_encounter(character: dict) -> bool:
     """
     Run the Forest Guardian's final riddle challenge.
 
@@ -523,7 +525,7 @@ def final_boss_encounter(character):
         print("Try again...\n")
 
 
-def display_map(rows, columns, character):
+def display_map(rows: int, columns: int, character: dict):
     """
     Display the game board with the player and goal positions.
 
