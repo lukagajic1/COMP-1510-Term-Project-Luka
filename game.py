@@ -445,7 +445,7 @@ def level_up(character: dict) -> None:
 
     >>> player = make_character("Luka")
     >>> level_up(player)
-    Luka leveled up to level 2!
+    Luka leveled up to level 2 (Intermediate)!
     Max HP is now 10 and Luck is now 2.
     <BLANKLINE>
     >>> player["Level"]
