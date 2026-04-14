@@ -101,34 +101,38 @@ def game():
         direction = get_user_choice()
         valid_move = validate_move(board, character, direction)
 
-        if valid_move:
-            move_character(character, direction)
-            display_map(rows, columns, character)
-            describe_current_location(board, character)
-
-            if check_if_goal_attained(rows, columns, character):
-                if character["Level"] < 3:
-                    print("You found the Forest Guardian, but you must be level 3 to challenge it.")
-                else:
-                    achieved_goal = final_boss_encounter(character)
-            else:
-                there_is_a_challenge = check_for_foes()
-
-                if there_is_a_challenge:
-                    challenge_type = choose_challenge()
-
-                    if challenge_type == "enemy":
-                        won = guessing_game(character)
-                    else:
-                        won = potion_gamble(character)
-
-                    if won:
-                        gain_experience(character)
-                        if has_leveled_up(character):
-                            level_up(character)
-        else:
+        if not valid_move:
             print(f"You are at position ({character['X-coordinate']}, {character['Y-coordinate']}) "
                   f"You cannot go that way. Try again.")
+            continue
+
+        move_character(character, direction)
+        display_map(rows, columns, character)
+        describe_current_location(board, character)
+
+        if check_if_goal_attained(rows, columns, character):
+            if character["Level"] < 3:
+                print("You found the Forest Guardian, but you must be level 3 to challenge it.")
+            else:
+                achieved_goal = final_boss_encounter(character)
+            continue
+
+        there_is_a_challenge = check_for_foes()
+
+        if not there_is_a_challenge:
+            continue
+
+        challenge_type = choose_challenge()
+
+        if challenge_type == "enemy":
+            won = guessing_game(character)
+        else:
+            won = potion_gamble(character)
+
+        if won:
+            gain_experience(character)
+            if has_leveled_up(character):
+                level_up(character)
 
     if achieved_goal:
         print("Congratulations! You defeated the Forest Guardian and escaped!")
@@ -136,7 +140,7 @@ def game():
         print("Game over! You ran out of HP.")
 
 
-def describe_current_location(board: dict, character: dict):
+def describe_current_location(board: dict, character: dict) -> None:
     """
     Describe the character's current location on the board.
 
@@ -225,7 +229,7 @@ def validate_move(board: dict, character: dict, direction: str) -> bool:
     return (character_copy["X-coordinate"], character_copy["Y-coordinate"]) in board
 
 
-def move_character(character: dict, direction: str):
+def move_character(character: dict, direction: str) -> None:
     """
     Update the character X or Y coordinates value in the character dictionary based on the chosen direction.
 
@@ -366,7 +370,7 @@ def is_alive(character: dict) -> bool:
     return character["Current HP"] > 0
 
 
-def gain_experience(character: dict):
+def gain_experience(character: dict) -> None:
     """
     Add experience to the player character and display progress.
 
@@ -427,7 +431,7 @@ def has_leveled_up(character: dict) -> bool:
     return current_level in thresholds and character["EXP"] >= thresholds[current_level]
 
 
-def level_up(character: dict):
+def level_up(character: dict) -> None:
     """
     Increase the character's level and increase character level, max hp, current hp, and luck.
 
@@ -525,7 +529,7 @@ def final_boss_encounter(character: dict) -> bool:
         print("Try again...\n")
 
 
-def display_map(rows: int, columns: int, character: dict):
+def display_map(rows: int, columns: int, character: dict) -> None:
     """
     Display the game board with the player and goal positions.
 
@@ -590,3 +594,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
