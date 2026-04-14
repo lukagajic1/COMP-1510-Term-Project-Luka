@@ -6,6 +6,7 @@ Create a game.
 """
 import random
 import copy
+from itertools import product
 
 
 def make_board(rows, columns):
@@ -50,7 +51,10 @@ def make_board(rows, columns):
         raise ValueError("columns must be greater than 0")
 
     else:
-        game_board = {(row, column): random.choice(descriptions) for row in range(rows) for column in range(columns)}
+        game_board = {
+            (row, column): random.choice(descriptions)
+            for row, column in product(range(rows), range(columns))
+        }
 
     return game_board
 
