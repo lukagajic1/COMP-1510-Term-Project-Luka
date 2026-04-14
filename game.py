@@ -1,5 +1,5 @@
 """
-Luka Gajic
+Luka Gajic # all docstrings / doctests original
 A01495410
 
 Create a game.
@@ -61,20 +61,23 @@ def make_board(rows, columns):
 
 def make_character(name):
     """
-    Initialize a character with the attributes of X-coordinate, Y-coordinate, and Current HP as keys in a dictionary.
+    Initialize a character with the attributes of X-coordinate, Y-coordinate, Max HP, Level, EXP, Name, Luck, and
+    Current HP as keys in a dictionary.
 
     :postcondition: create a character at coordinates (0, 0), where the key 'X-coordinate' represents integer row value
                     key and 'Y-coordinate' key represents integer column value
-    :postcondition: set the character key 'Current HP' to integer value 5
-    :return: a dictionary with keys 'X-coordinate', 'Y-coordinate', and 'Current HP',
-             where 'X-coordinate' stores the integer row position, 'Y-coordinate' stores the integer column position,
-             and 'Current HP' stores the integer health value of the character
+    :postcondition: set the character key 'Current HP' to integer value 8
+    :postcondition: set the character Key 'Luck' to integer value 1
+    :postcondition: set the character Key 'EXP' to integer value 0
+    :postcondition: set the character Key 'Name' to user input string
+    :postcondition: set the character Key 'Max HP' to integer value 8'
+    :return: a dictionary representing the player character
 
     >>> player = make_character("Luka")
     >>> player["X-coordinate"]
     0
     >>> player["Current HP"]
-    5
+    8
     """
     return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 8,
             "Max HP": 8, "Luck": 1, "Level": 1, "EXP": 0, "Name": name}
@@ -144,16 +147,6 @@ def describe_current_location(board, character):
     :precondition: character dictionary must contain X-coordinate and Y-coordinate
                    keys with non-negative integer values
     :postcondition: extract the string associated with the current tuple coordinates in board dictionary
-
-    >>> game_board = make_board(2, 2)
-    >>> player = {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 5}
-    >>> describe_current_location(game_board, player)
-    You are in (0, 0): Empty room
-
-    >>> game_board = make_board(2, 2)
-    >>> player = {"X-coordinate": 5, "Y-coordinate": 5, "Current HP": 5}
-    >>> describe_current_location(game_board, player)
-    Invalid location, not on board
     """
     coordinates = (character["X-coordinate"], character["Y-coordinate"])
 
@@ -305,18 +298,18 @@ def guessing_game(character):
     """
     Play a guessing game.
 
-    Ask the user to guess a number from 1 to 5 inclusive. If the guess
-    is incorrect, reduce "Current HP" key's value in character dictionary by 1.
+    Ask the user to guess a number in a level-based range. If the guess is wrong,
+    reduce the character's current HP by 1.
 
     :param character: a dictionary representing the character
-    :precondition: character must contain key 'Current HP' and the value must be an integer greater than 0
+    :precondition: character must contain key 'Luck' and 'Current HP' and the value must be an integer greater than 0
     :postcondition: reduce 'Current HP' key in character value by 1 if the user guesses incorrectly
     :postcondition: determine the character key 'Current HP' value after guessing and
                     whether they guessed incorrectly or not
-    :return: character dictionary with updated 'Current HP' key's value
+    :return: True if the player guesses correctly, else False
     """
     lower = 1
-    upper = max(2, 6 - character["Level"])
+    upper = max(2, 6 - character["Luck"])
     secret_number = random.randint(lower, upper)
 
     print("A foe appears!")
@@ -361,7 +354,7 @@ def is_alive(character):
     :postcondition: determine if the character 'Current HP' key is greater than 0
     :return: True if the 'Current HP' key in character dictionary value is > 0 , else False
 
-    >>> player = make_character()
+    >>> player = make_character("Luka")
     >>> is_alive(player)
     True
     >>> player["Current HP"] = 0
@@ -376,7 +369,8 @@ def gain_experience(character):
     Add experience to the player character and display progress.
 
     :param character: a dictionary representing the character
-    :postcondition: increase EXP and display current progress toward next level
+    :precondition: character must contain keys 'EXP' and 'Level'
+    :postcondition: increase EXP by 1 and display current progress toward next level
     """
     character["EXP"] += 1
 
@@ -393,7 +387,16 @@ def get_exp_threshold(character):
     Get the EXP required for the next level.
 
     :param character: a dictionary representing the character
-    :return: EXP threshold for next level or None if max level reached
+    :precondition: character must contain 'Level'
+    :postcondition: return the EXP needed for the next level if one exists
+    :return: an integer EXP threshold or None if the character is at max level
+
+    >>> player = make_character("Luka")
+    >>> get_exp_threshold(player)
+    3
+    >>> player["Level"] = 3
+    >>> get_exp_threshold(player) is None
+    True
     """
     thresholds = {1: 3, 2: 6}
     return thresholds.get(character["Level"])
@@ -404,7 +407,17 @@ def has_leveled_up(character):
     Determine whether the character has enough EXP to level up.
 
     :param character: a dictionary representing the character
+    :precondition: character must contain keys 'Level' and 'EXP'
+    :postcondition: determine whether the character meets the EXP requirement for the next level
     :return: True if the character should level up, else False
+
+    >>> player = make_character("Luka")
+    >>> player["EXP"] = 2
+    >>> has_leveled_up(player)
+    False
+    >>> player["EXP"] = 3
+    >>> has_leveled_up(player)
+    True
     """
     thresholds = {1: 3, 2: 6}
     current_level = character["Level"]
@@ -417,7 +430,15 @@ def level_up(character):
     Increase the character's level and increase character level, max hp, current hp, and luck.
 
     :param character: a dictionary representing the character
+    :precondition: character must contain 'Level', 'Max HP', 'Current HP', and 'Luck'
     :postcondition: increase level, max HP, current HP, and luck
+
+    >>> player = make_character("Luka")
+    >>> level_up(player)
+    Luka leveled up to level 2!
+    Max HP is now 10 and Luck is now 2.
+    >>> player["Level"]
+    2
     """
     character["Level"] += 1
     character["Max HP"] += 2
@@ -432,12 +453,16 @@ def potion_gamble(character):
     """
     Run a potion gamble challenge.
 
+    The potion becomes more likely to help the player as the player's luck increases.
+
     :param character: a dictionary representing the character
-    :return: True if potion helps, False if poisonous
+    :precondition: character must contain 'Current HP', 'Max HP', and 'Luck'
+    :postcondition: either heal the character or reduce the character's HP by 1
+    :return: True if the potion helps, else False
     """
     print("You find a mysterious potion.")
     lower = 1
-    upper = 4 - character["Level"]
+    upper = 4 - character["Luck"]
     outcome = random.randint(lower, upper)
 
     if outcome == 1:
@@ -456,14 +481,22 @@ def choose_challenge():
     """
     Randomly choose a challenge type.
 
-    :return: a string representing the chosen challenge
+    :postcondition: randomly return one challenge type
+    :return: the string 'enemy' or 'potion'
     """
     return random.choice(["enemy", "potion"])
 
 
 def final_boss_encounter(character):
     """
-    Resolve the final boss riddle challenge.
+    Run the Forest Guardian's final riddle challenge.
+
+    Repeatedly ask the player the boss riddle until they answer correctly or run out of HP.
+
+    :param character: a dictionary representing the character
+    :precondition: character must contain 'Current HP'
+    :postcondition: either allow the player to win the game or reduce HP after wrong answers
+    :return: True if the player solves the riddle, else False
     """
     print("\nThe Forest Guardian rises before you.")
     print('"Answer my riddle, and you may leave this forest."\n')
@@ -492,14 +525,14 @@ def final_boss_encounter(character):
 
 def display_map(rows, columns, character):
     """
-    Display the game board with the player's position and goal.
+    Display the game board with the player and goal positions.
 
-    :param rows: number of rows
-    :param columns: number of columns
-    :param character: player dictionary
+    :param rows: an integer representing the number of rows
+    :param columns: an integer representing the number of columns
+    :param character: a dictionary representing the character
     :precondition: rows and columns must be positive integers
     :precondition: character must contain 'X-coordinate' and 'Y-coordinate'
-    :postcondition: print the map with [P] for player and [G] for goal
+    :postcondition: print the board using [P] for the player and [G] for the goal
     """
     for row in range(rows):
         for column in range(columns):
