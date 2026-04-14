@@ -61,8 +61,8 @@ def make_board(rows: int, columns: int) -> dict:
 
 def make_character(name: str) -> dict:
     """
-    Initialize a character with the attributes of X-coordinate, Y-coordinate, Max HP, Level, EXP, Name, Luck, and
-    Current HP as keys in a dictionary.
+    Initialize a character with the attributes of X-coordinate, Y-coordinate, Max HP, Level, EXP, Name, Luck, Level Name
+    and Current HP as keys in a dictionary.
 
     :postcondition: create a character at coordinates (0, 0), where the key 'X-coordinate' represents integer row value
                     key and 'Y-coordinate' key represents integer column value
@@ -71,6 +71,7 @@ def make_character(name: str) -> dict:
     :postcondition: set the character Key 'EXP' to integer value 0
     :postcondition: set the character Key 'Name' to user input string
     :postcondition: set the character Key 'Max HP' to integer value 8'
+    :postcondition: set the character key 'Level Name' to string 'Beginner'
     :return: a dictionary representing the player character
 
     >>> player = make_character("Luka")
@@ -80,7 +81,7 @@ def make_character(name: str) -> dict:
     8
     """
     return {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 8,
-            "Max HP": 8, "Luck": 1, "Level": 1, "EXP": 0, "Name": name}
+            "Max HP": 8, "Luck": 1, "Level": 1, "EXP": 0, "Name": name, "Level Name": "Beginner"}
 
 
 def game():
@@ -451,11 +452,18 @@ def level_up(character: dict) -> None:
     2
     """
     character["Level"] += 1
+
+    if character["Level"] == 2:
+        character["Level Name"] = "Intermediate"
+
+    elif character["Level"] == 3:
+        character["Level Name"] = "Forest Challenger"
+
     character["Max HP"] += 2
     character["Current HP"] = character["Max HP"]
     character["Luck"] += 1
 
-    print(f"{character['Name']} leveled up to level {character['Level']}!")
+    print(f"{character['Name']} leveled up to level {character['Level']} ({character['Level Name']})!")
     print(f"Max HP is now {character['Max HP']} and Luck is now {character['Luck']}.\n")
 
 
@@ -606,6 +614,7 @@ def describe_game():
     print("- Higher Luck makes enemy challenges easier")
     print("- The number range in guessing games becomes smaller\n")
 
+    print("You begin at level 1 (Beginner)")
     print("Reach level 3 to have a chance of defeating the Forest Guardian.")
     print("Stay alive and escape the forest!")
     print("=" * 60 + "\n")
