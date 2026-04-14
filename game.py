@@ -101,38 +101,36 @@ def game():
         direction = get_user_choice()
         valid_move = validate_move(board, character, direction)
 
-        if not valid_move:
+        if valid_move:
+            move_character(character, direction)
+            display_map(rows, columns, character)
+            describe_current_location(board, character)
+
+            if check_if_goal_attained(rows, columns, character):
+                if character["Level"] < 3:
+                    print("You found the Forest Guardian, but you must be level 3 to challenge it.")
+                else:
+                    achieved_goal = final_boss_encounter(character)
+            else:
+                there_is_a_challenge = check_for_foes()
+
+                if there_is_a_challenge:
+                    challenge_type = choose_challenge()
+
+                    if challenge_type == "enemy":
+                        won = guessing_game(character)
+                    elif challenge_type == "potion":
+                        won = potion_gamble(character)
+                    else:
+                        won = dice_roll_challenge(character)
+
+                    if won:
+                        gain_experience(character)
+                        if has_leveled_up(character):
+                            level_up(character)
+        else:
             print(f"You are at position ({character['X-coordinate']}, {character['Y-coordinate']}) "
                   f"You cannot go that way. Try again.")
-            continue
-
-        move_character(character, direction)
-        display_map(rows, columns, character)
-        describe_current_location(board, character)
-
-        if check_if_goal_attained(rows, columns, character):
-            if character["Level"] < 3:
-                print("You found the Forest Guardian, but you must be level 3 to challenge it.")
-            else:
-                achieved_goal = final_boss_encounter(character)
-            continue
-
-        there_is_a_challenge = check_for_foes()
-
-        if not there_is_a_challenge:
-            continue
-
-        challenge_type = choose_challenge()
-
-        if challenge_type == "enemy":
-            won = guessing_game(character)
-        else:
-            won = potion_gamble(character)
-
-        if won:
-            gain_experience(character)
-            if has_leveled_up(character):
-                level_up(character)
 
     if achieved_goal:
         print("Congratulations! You defeated the Forest Guardian and escaped!")
@@ -488,33 +486,52 @@ def choose_challenge() -> str:
     Randomly choose a challenge type.
 
     :postcondition: randomly return one challenge type
-    :return: the string 'enemy' or 'potion'
+    :return: the string 'enemy', 'potion' or 'dice'
     """
-    return random.choice(["enemy", "potion"])
+    return random.choice(["enemy", "potion", "dice"])
 
 
 def final_boss_encounter(character: dict) -> bool:
     """
-    Run the Forest Guardian's final riddle challenge.
+    Run the Forest Guardian's final multiple-choice riddle challenge.
 
-    Repeatedly ask the player the boss riddle until they answer correctly or run out of HP.
+    Repeatedly ask the player the riddle until they select the correct answer
+    or run out of HP.
 
     :param character: a dictionary representing the character
     :precondition: character must contain 'Current HP'
     :postcondition: either allow the player to win the game or reduce HP after wrong answers
-    :return: True if the player solves the riddle, else False
+    :return: True if the player answers correctly, else False
     """
-    print("\nThe Forest Guardian rises before you.")
-    print('"Answer my riddle, and you may leave this forest."\n')
+    correct_answer = 2
 
     while True:
+        print("\nThe Forest Guardian rises before you.")
+        print('"Answer my riddle, and you may leave this forest."\n')
+
         print("What walks on four legs in the morning,")
         print("two legs in the afternoon,")
-        print("and one leg at night?")
+        print("and one leg at night?\n")
 
-        answer = input("\nEnter your answer: ").strip().lower()
+        print("1. Dog")
+        print("2. Human")
+        print("3. Spider")
+        print("4. Bird")
+        print("5. Snake")
 
-        if answer in ["human", "a human", "man", "a man", "person", "a person"]:
+        user_input = input("\nEnter your choice (1-5): ")
+
+        try:
+            choice = int(user_input)
+        except ValueError:
+            print("Please enter an integer from 1 to 5.")
+            continue
+
+        if choice not in range(1, 6):
+            print("That is not a valid option. Choose a number from 1 to 5.")
+            continue
+
+        if choice == correct_answer:
             print("\nThe Forest Guardian bows before you.")
             print("You solved the riddle and escaped the forest!")
             return True
@@ -527,6 +544,8 @@ def final_boss_encounter(character: dict) -> bool:
             return False
 
         print("Try again...\n")
+
+    return False
 
 
 def display_map(rows: int, columns: int, character: dict) -> None:
@@ -569,7 +588,8 @@ def describe_game():
 
     print("As you explore, you will encounter challenges:")
     print("- Enemies (guessing games)")
-    print("- Potions (which may help or harm you)\n")
+    print("- Potions (which may help or harm you)")
+    print("- Dice games of chance\n")
 
     print("Leveling System:")
     print("- You gain EXP when you win encounters")
@@ -585,6 +605,69 @@ def describe_game():
     print("=" * 60 + "\n")
 
 
+def dice_roll_challenge(character: dict) -> bool:
+    """
+    Run a dice roll challenge with luck-based retries.
+
+    The player must guess whether the roll will be higher, lower, or equal
+    to a given number. Luck determines how many retries they get.
+
+    :param character: a dictionary representing the character
+    :return: True if the player succeeds, else False
+    """
+    retries = character["Luck"] - 1
+
+    while True:
+        given_number = random.randint(2, 5)
+
+        print("\nA forest spirit challenges you to a game of chance.")
+        print(f"The number is {given_number}.")
+        print("\nYou roll a 6 sided die, select which answer matches your unknown rolled number...")
+        print("1. Higher")
+        print("2. Lower")
+        print("3. Equal")
+
+        user_input = input("Enter your choice (1-3): ")
+
+        try:
+            choice = int(user_input)
+        except ValueError:
+            print("Please enter 1, 2, or 3.")
+            continue
+
+        if choice not in [1, 2, 3]:
+            print("That is not a valid option.")
+            continue
+
+        roll = random.randint(1, 6)
+        print(f"You rolled a {roll}.")
+
+        if choice == 1 and roll > given_number:
+            print("You guessed correctly!")
+            return True
+
+        if choice == 2 and roll < given_number:
+            print("You guessed correctly!")
+            return True
+
+        if choice == 3 and roll == given_number:
+            print("Perfect guess! You matched the number!")
+            return True
+
+        print("Wrong guess.")
+
+        if retries > 0:
+            retries -= 1
+            print("Your luck gives you another chance...\n")
+            continue
+
+        character["Current HP"] -= 1
+        print(f"You lose 1 HP and now have {character['Current HP']} HP.")
+        return False
+
+    return False
+
+
 def main():
     """
     Drive the program.
@@ -594,4 +677,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
