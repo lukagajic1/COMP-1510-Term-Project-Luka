@@ -41,3 +41,8 @@ class Test(TestCase):
         actual = make_character("Luka")["Name"]
         expected = "Luka"
         self.assertEqual(expected, actual)
+
+    def test_make_character_level_name(self):
+        actual = make_character("Luka")["Level Name"]
+        expected = "Beginner"
+        self.assertEqual(expected, actual)

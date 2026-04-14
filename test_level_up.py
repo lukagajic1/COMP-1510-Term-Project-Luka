@@ -30,3 +30,10 @@ class Test(TestCase):
         actual = character["Luck"]
         expected = 2
         self.assertEqual(expected, actual)
+
+    def test_level_up_updates_level_name(self):
+        character = make_character("Luka")
+        level_up(character)
+        actual = character["Level Name"]
+        expected = "Intermediate"
+        self.assertEqual(expected, actual)
