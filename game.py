@@ -104,6 +104,7 @@ def game():
         if valid_move:
             move_character(character, direction)
             display_map(rows, columns, character)
+            print()
             describe_current_location(board, character)
 
             if check_if_goal_attained(rows, columns, character):
@@ -115,6 +116,9 @@ def game():
                 there_is_a_challenge = check_for_foes()
 
                 if there_is_a_challenge:
+                    print()
+                    print("A challenge appears...")
+                    print()
                     challenge_type = choose_challenge()
 
                     if challenge_type == "enemy":
@@ -128,11 +132,13 @@ def game():
                         gain_experience(character)
                         if has_leveled_up(character):
                             level_up(character)
+
         else:
             print(f"You are at position ({character['X-coordinate']}, {character['Y-coordinate']}) "
                   f"You cannot go that way. Try again.")
 
     if achieved_goal:
+        print()
         print("Congratulations! You defeated the Forest Guardian and escaped!")
     else:
         print("Game over! You ran out of HP.")
@@ -173,8 +179,7 @@ def get_user_choice() -> str:
         for key, value in directions.items():
             print(key, value)
 
-        user_input = input("Enter the integer corresponding to your desired direction: ")
-        print()
+        user_input = input("Enter the integer corresponding to your desired direction: \n")
 
         try:
             choice = int(user_input)
@@ -441,6 +446,7 @@ def level_up(character: dict) -> None:
     >>> level_up(player)
     Luka leveled up to level 2!
     Max HP is now 10 and Luck is now 2.
+    <BLANKLINE>
     >>> player["Level"]
     2
     """
@@ -450,7 +456,7 @@ def level_up(character: dict) -> None:
     character["Luck"] += 1
 
     print(f"{character['Name']} leveled up to level {character['Level']}!")
-    print(f"Max HP is now {character['Max HP']} and Luck is now {character['Luck']}.")
+    print(f"Max HP is now {character['Max HP']} and Luck is now {character['Luck']}.\n")
 
 
 def potion_gamble(character: dict) -> bool:
@@ -468,16 +474,16 @@ def potion_gamble(character: dict) -> bool:
     lower = 1
     upper = 4 - character["Luck"]
     outcome = random.randint(lower, upper)
-
+    print(f"You have a 1 and {upper} chance of healing.")
     if outcome == 1:
         if character["Current HP"] < character["Max HP"]:
             character["Current HP"] += 1
-        print(f"The potion helps you. HP is now {character['Current HP']}.")
+        print(f"You are in luck, the potion helps you. HP is now {character['Current HP']}.")
         return True
 
     else:
         character["Current HP"] -= 1
-        print(f"The potion was poisonous. HP is now {character['Current HP']}.")
+        print(f"Luck is not on your side, the potion was poisonous. HP is now {character['Current HP']}.")
         return False
 
 
@@ -621,8 +627,8 @@ def dice_roll_challenge(character: dict) -> bool:
         given_number = random.randint(2, 5)
 
         print("\nA forest spirit challenges you to a game of chance.")
-        print(f"The number is {given_number}.")
-        print("\nYou roll a 6 sided die, select which answer matches your unknown rolled number...")
+        print(f"They rolled a dice and it landed on the number {given_number}.")
+        print("\nYour turn to roll, will your roll be higher, lower, or equal to this number?")
         print("1. Higher")
         print("2. Lower")
         print("3. Equal")
@@ -632,26 +638,26 @@ def dice_roll_challenge(character: dict) -> bool:
         try:
             choice = int(user_input)
         except ValueError:
-            print("Please enter 1, 2, or 3.")
+            print("Please enter 1, 2, or 3.\n")
             continue
 
         if choice not in [1, 2, 3]:
-            print("That is not a valid option.")
+            print("That is not a valid option.\n")
             continue
 
         roll = random.randint(1, 6)
         print(f"You rolled a {roll}.")
 
         if choice == 1 and roll > given_number:
-            print("You guessed correctly!")
+            print("You guessed correctly!\n")
             return True
 
         if choice == 2 and roll < given_number:
-            print("You guessed correctly!")
+            print("You guessed correctly!\n")
             return True
 
         if choice == 3 and roll == given_number:
-            print("Perfect guess! You matched the number!")
+            print("Perfect guess! You matched the number!\n")
             return True
 
         print("Wrong guess.")
@@ -662,7 +668,7 @@ def dice_roll_challenge(character: dict) -> bool:
             continue
 
         character["Current HP"] -= 1
-        print(f"You lose 1 HP and now have {character['Current HP']} HP.")
+        print(f"You lose 1 HP and now have {character['Current HP']} HP.\n")
         return False
 
     return False
