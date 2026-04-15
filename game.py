@@ -655,7 +655,7 @@ def dice_roll_challenge(character: dict) -> bool:
             print("Please enter 1, 2, or 3.\n")
             continue
 
-        if choice not in [1, 2, 3] or type(choice) != int:
+        if choice not in [1, 2, 3]:
             print("That is not a valid option.\n")
             continue
 
