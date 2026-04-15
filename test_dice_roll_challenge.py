@@ -71,10 +71,10 @@ class Test(TestCase):
         self.assertEqual(expected, actual)
 
     @patch('builtins.input', side_effect=["1", "1"])
-    @patch('random.randint', side_effect=[4, 2, 3, 6])  # retry: given=4,roll=2 wrong; given=3,roll=6 correct
+    @patch('random.randint', side_effect=[4, 2, 6])  # given=4, roll=2 wrong; retry roll=6 correct
     def test_luck_retry_succeeds_on_second_attempt_returns_true(self, _, __):
         character = make_character("Luka")
-        character["Luck"] = 2  # 1 retry
+        character["Luck"] = 2
         actual = dice_roll_challenge(character)
         expected = True
         self.assertEqual(expected, actual)
