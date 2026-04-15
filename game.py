@@ -636,9 +636,9 @@ def dice_roll_challenge(character: dict) -> bool:
     :return: True if the player succeeds, else False
     """
     retries = character["Luck"] - 1
+    given_number = random.randint(2, 5)
 
     while True:
-        given_number = random.randint(2, 5)
 
         print("\nA forest spirit challenges you to a game of chance.")
         print(f"They rolled a dice and it landed on the number {given_number}.")
