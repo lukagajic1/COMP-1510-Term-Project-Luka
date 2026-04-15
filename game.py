@@ -102,41 +102,46 @@ def game():
         direction = get_user_choice()
         valid_move = validate_move(board, character, direction)
 
-        if valid_move:
-            move_character(character, direction)
-            display_map(rows, columns, character)
-            print()
-            describe_current_location(board, character)
-
-            if check_if_goal_attained(rows, columns, character):
-                if character["Level"] < 3:
-                    print("You found the Forest Guardian, but you must be level 3 to challenge it.")
-                else:
-                    achieved_goal = final_boss_encounter(character)
-            else:
-                there_is_a_challenge = check_for_foes()
-
-                if there_is_a_challenge:
-                    print()
-                    print("A challenge appears...")
-                    print()
-                    challenge_type = choose_challenge()
-
-                    if challenge_type == "enemy":
-                        won = guessing_game(character)
-                    elif challenge_type == "potion":
-                        won = potion_gamble(character)
-                    else:
-                        won = dice_roll_challenge(character)
-
-                    if won:
-                        gain_experience(character)
-                        if has_leveled_up(character):
-                            level_up(character)
-
-        else:
+        if not valid_move:
             print(f"You are at position ({character['X-coordinate']}, {character['Y-coordinate']}) "
                   f"You cannot go that way. Try again.")
+            continue
+
+        move_character(character, direction)
+        display_map(rows, columns, character)
+        print()
+        describe_current_location(board, character)
+
+        if check_if_goal_attained(rows, columns, character):
+            if character["Level"] < 3:
+                print("You found the Forest Guardian, but you must be level 3 to challenge it.")
+            else:
+                achieved_goal = final_boss_encounter(character)
+            continue
+
+        there_is_a_challenge = check_for_foes()
+
+        if not there_is_a_challenge:
+            continue
+
+        print()
+        print("A challenge appears...")
+        print()
+
+        challenge_type = choose_challenge()
+
+        if challenge_type == "enemy":
+            won = guessing_game(character)
+        elif challenge_type == "potion":
+            won = potion_gamble(character)
+        else:
+            won = dice_roll_challenge(character)
+
+        if won:
+            gain_experience(character)
+
+            if has_leveled_up(character):
+                level_up(character)
 
     if achieved_goal:
         print()
@@ -650,7 +655,7 @@ def dice_roll_challenge(character: dict) -> bool:
             print("Please enter 1, 2, or 3.\n")
             continue
 
-        if choice not in [1, 2, 3]:
+        if choice not in [1, 2, 3] or type(choice) != int:
             print("That is not a valid option.\n")
             continue
 
