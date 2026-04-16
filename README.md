@@ -41,7 +41,9 @@ Your goal is to survive, grow stronger, and escape the forest.
 
 2. In your terminal, navigate to the project folder
 
-3. Run the game: python game.py
+3. Run the game:
+   - python3 game.py (Mac)
+   - python game.py (Windows)
 
 4. Enter your name and begin playing
 
